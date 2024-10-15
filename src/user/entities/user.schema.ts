@@ -24,3 +24,4 @@ export const userSchema = new Schema<IUser>({
     versionKey: false
 }
 )
+
