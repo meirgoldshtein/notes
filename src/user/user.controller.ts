@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,14 +8,30 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('register')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      const user = await this.userService.create(createUserDto);
+      console.log(user)
+      if (!user) {
+        throw new BadRequestException('User not created');
+      }
+
+      return {
+        'success': true,
+        'user': user
+      }
+
+    } catch (error) {
+      return {
+        'success': false,
+        error
+      }
+    }
   }
 
-
-  @Get('profile/:id')
+  @Get('profile')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
 }
